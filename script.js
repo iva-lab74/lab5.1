@@ -18,37 +18,49 @@ function removeItem(event) {
   const price = parseFloat(item.dataset.price);
   const quantity = parseInt(item.dataset.quantity);
 
-  updateTotalPrice(-(price*quantity));
+  updateTotalPrice(-(price * quantity));
   item.remove();
 }
 
 
 //Add items to their cart dynamically
 addProductButton.addEventListener('click', () => {
-const name = productNameInput.value;
+const pName = productNameInput.value;
 const price = parseFloat(productPriceInput.value);
 
-//remembering
+//remembering prices and quantity
 const newProduct = document.createElement('li');
-newProduct.innerHTML = '<button class="add-to-cart">Add to Cart</button>';
+newProduct.dataset.price = price;   
+newProduct.dataset.quantity = 1; 
+
+
+//View the items they have added, along with their prices and quantities.
+newProduct.innerHTML = `${pName} - $${price.toFixed(2)} each Qty: <input type="number" class="quantity" value="1" min="1"><button class="remove">Remove</button>`;
 cart.appendChild(newProduct);
-updateTotalPrice();
+updateTotalPrice(price);
 
  productNameInput.value = '';
  productPriceInput.value = '';
 });
 
-// for (let i = 0; i < 5; i++) {
-// const li = document.createElement('li');
-// li.textContent = 'Item ' + (list.children.length + i + 1);
-// fragment.appendChild(li);
-// }
-
-
-
-//View the items they have added, along with their prices and quantities.
-
 
 //Update the quantity of items in the cart, reflecting real-time price changes.
+cart.addEventListener('input', (event) => {
+  if (!event.target.classList.contains('quantity')) return;
+
+  const item = event.target.closest('li');
+  const price = parseFloat(item.dataset.price);
+  const oldQuantity = parseInt(item.dataset.quantity);
+  const newQuantity = parseInt(event.target.value);
+
+//editing prices
+  updateTotalPrice((newQuantity - oldQuantity) * price);
+  item.dataset.quantity = newQuantity; 
+});
 
 //Remove items from the cart.
+cart.addEventListener('click', (event) => {
+  if (event.target.classList.contains('remove')) {
+    removeItem(event);
+  }
+});
